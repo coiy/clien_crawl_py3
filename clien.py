@@ -110,22 +110,20 @@ def pasing_url(link):
 			#print '0'
 
 		try:
-			symph = el.findAll("div", {"class": "list-symph"})
-			recom = symph[0].text
+			symph = el.find("div", {"data-role": "list-like-count"})
+			span = symph.find('span')
+			recom = span.text
 			#print recom
 
 		except:
 			recom = '0'
 			#print '0'
 
-		lst_cate = link.split('/')
-		c = lst_cate[-1]
-		ca = c.split('?')
-		category = ca[0]
+		category = el.find("span", {"class": "category"}).attrs["title"]
 
 		
 		# 덧글 10개 이상이면 내용 가져오기
-		if ( int(reply) >= 10 ) or ( int (recom) >= 5 ):
+		#if ( int(reply) >= 10 ) or ( int (recom) >= 5 ):
 			#기존 저장 된건가? 
 			# feedly 에 제목이 두번나온다. 일단 제목에 업데이트 금지.
 			if not check_pk (url, reply, recom):
@@ -153,7 +151,7 @@ def pasing_url(link):
 				insert_bbs(category, title, text, url, pubdate.strip(), author, reply, recom )
 				print ("INSERT BODY!! ")
 					
-		continue; 
+		#continue; 
 
 
 		
