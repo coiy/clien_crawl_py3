@@ -111,7 +111,7 @@ def pasing_url(link):
 
 		try:
 			symph = el.find("div", {"data-role": "list-like-count"})
-			span = symph.find('span')
+			span = symph.find("span")
 			recom = span.text
 			#print recom
 
@@ -131,22 +131,22 @@ def pasing_url(link):
 				
 				# BeautifulSoup 로 파싱
 				soup = BeautifulSoup(r.text, "lxml")
-				elements=soup.findAll("body")
-				text = elements[1]
+				elements = soup.find("div", {"class": "post_article fr-view"}).text
+				text = elements
 				
 				# 날짜
-				pdate = soup.findAll("div", {"class": "post-time"})
-				pubdate = pdate[0].text.strip()
+				pdate = soup.find("div", {"class": "post_author"})
+				pubdate = pdate.find("span").text.strip()
 				
 				#<button class="button-md button-report" onclick="app.articleSingo('samsung');
 				
 				# 글쓴이
-				pauthor = soup.findAll("button", {"class": "button-md button-report"})
-				auth1 = ''.join(pauthor[0].encode('utf-8'))
+				#pauthor = soup.find("span", {"class": "contact_name"}).text.strip()
+				#auth1 = ''.join(pauthor[0].encode('utf-8'))
 				# 정규식
 				# 문자숫자\w+ 로 시작하고 끝이 따옴표이지만 포함하지 않음
-				rex = re.search("[\w]+(?=\')", auth1)
-				author = rex.group()
+				# rex = re.search("[\w]+(?=\')", auth1)
+				author = soup.find("span", {"class": "contact_name"}).text.strip()
 				
 				insert_bbs(category, title, text, url, pubdate.strip(), author, reply, recom )
 				print ("INSERT BODY!! ")
