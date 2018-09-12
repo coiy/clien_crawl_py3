@@ -20,15 +20,15 @@ def makerss():
   lst_reply = []
   lst_recom = []
 
-  db = MySQLdb.connect(config.mysql_server, config.mysql_id, config.mysql_password, config.mysql_db, charset='utf8')
+  db = MySQLdb.connect(config.mysql_server, config.mysql_id, config.mysql_password, config.mysql_db, charset='utf8mb4')
   curs = db.cursor(MySQLdb.cursors.DictCursor)
 
   rss = PyRSS2Gen.RSS2(
     title = "clien_crawl",
     link = "https://www.clien.net",
-    description = "RSS_clien_hot10",
+    description = "RSS_clien",
     lastBuildDate = datetime.datetime.now(),
-    items = [] )
+    items = [])
 
   rowcount = curs.execute( """SELECT * FROM rss order by pubdate DESC limit 80 """ )
     
@@ -52,13 +52,13 @@ def makerss():
     # pubDate = datetime.datetime.fromtimestamp(lst_pubdate[i]),
     pubDate = lst_pubdate[i],
     author = lst_author[i])
-        
     rss.items.append(item)
 	
-  rss.write_xml(open("rss_clien_mac.xml",  "w"))
+  rss.write_xml(open("rss_clien_mac.xml",  "w"), "utf-8")
+  print('XML created')
 
 def check_pk(url, reply, recom):
-  db = MySQLdb.connect(config.mysql_server, config.mysql_id, config.mysql_password, config.mysql_db, charset='utf8')
+  db = MySQLdb.connect(config.mysql_server, config.mysql_id, config.mysql_password, config.mysql_db, charset='utf8mb4')
   curs = db.cursor(MySQLdb.cursors.DictCursor)
 		
   bFind = False
@@ -76,7 +76,7 @@ def check_pk(url, reply, recom):
     return bFind
 	
 def insert_bbs(category, title, text, url, pubdate, author, reply, recom):
-  db = MySQLdb.connect(config.mysql_server, config.mysql_id, config.mysql_password, config.mysql_db, charset='utf8')
+  db = MySQLdb.connect(config.mysql_server, config.mysql_id, config.mysql_password, config.mysql_db, charset='utf8mb4')
   curs = db.cursor(MySQLdb.cursors.DictCursor)
   curs.execute("""INSERT INTO rss (category, title, text, url, pubdate, author, reply, recom)
     VALUES (%s, %s, %s, %s, %s, %s, %s, %s) 
@@ -112,8 +112,11 @@ def pasing_url(link):
     except:
       recom = '0'
       #print '0'
-
-    category = el.find("span", {"class": "category"}).attrs["title"]
+    
+    try:
+      category = el.find("span", {"class": "category"}).attrs["title"]
+    except:
+      category = ' ' 	
 
     # 덧글 10개 이상이면 내용 가져오기
     #if ( int(reply) >= 10 ) or ( int (recom) >= 5 ):
@@ -129,6 +132,7 @@ def pasing_url(link):
       # 날짜
       pdate = soup.find("div", {"class": "post_author"})
       pubdate = pdate.find("span").text.strip()
+      pubdate = pubdate[0:20].strip()
 
       author = soup.find("span", {"class": "contact_name"}).text.strip()
 				
@@ -147,10 +151,10 @@ url_list = []
 url_list.append('https://www.clien.net/service/board/cm_mac')
 #url_list.append ( 'https://www.clien.net/service/board/jirum')
 
-#url_list.append ( 'https://www.clien.net/service/board/cm_iphonien')
+url_list.append ( 'https://www.clien.net/service/board/cm_iphonien')
 #url_list.append ( 'https://www.clien.net/service/board/cm_car')
-#url_list.append ( 'https://www.clien.net/service/board/cm_bike')
-#url_list.append ( 'https://www.clien.net/service/board/cm_havehome')
+url_list.append ( 'https://www.clien.net/service/board/cm_bike')
+url_list.append ( 'https://www.clien.net/service/board/cm_havehome')
 #url_list.append ( 'https://www.clien.net/service/board/cm_nas')
 
 
